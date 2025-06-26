@@ -71,29 +71,7 @@ public class Receiver implements Runnable{
             }
         }
     }
-/*
-    public static void UpdateUsers(TableView<User> tv_users, ObservableList<User> userList){
-        userList.addAll(users);
-        tv_users.setItems(userList);
-        tv_users.setEditable(false);
-    }
 
-    public static void UpdateMessages(ObservableList<Message> userMessages, ListView<Message> lv_messages) {
-        if (currentUser != null) {
-            if (messages.get(messages.size() - 1).getSender().equals(currentUser.getIp())) {
-                for (Message message : messages) {
-                    if (message.getSender().equals(currentUser.getIp())) {
-                        userMessages.add(message);
-                    }
-                }
-            } else {
-                // TODO notfay user of a new message
-            }
-        }
-
-        lv_messages.setItems(userMessages);
-    }
-*/
     @Override public void run() {
         try {
             Receiver(l_username,tf_main,tv_users,tc_users,tc_number_of_messages,lv_messages,userList,userMessages);
