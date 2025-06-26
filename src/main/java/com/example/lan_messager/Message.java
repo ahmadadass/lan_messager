@@ -4,12 +4,14 @@ import static com.example.lan_messager.MainController.users;
 
 public class Message {
     String massage;
-    String sender;
+    User sender;
+    User receiver;
     String time;
 
-    public Message(String massage, String sender, String time) {
+    public Message(String massage, User sender, User thisUser, String time) {
         this.massage = massage;
         this.sender = sender;
+        this.receiver = thisUser;
         this.time = time;
     }
 
@@ -17,8 +19,12 @@ public class Message {
         return this.massage;
     }
 
-    public String getSender() {
+    public User getSender() {
         return this.sender;
+    }
+
+    public User getReceiver() {
+        return this.receiver;
     }
 
     public User getSenderUserByIp(String ip){

@@ -29,6 +29,7 @@ public class MainController implements Initializable{
     static ArrayList<User> users = new ArrayList<User>();
     static ArrayList<Message> messages = new ArrayList<Message>();
     static User currentUser;
+    static User thisUser;
 
     private ObservableList<User> userList = FXCollections.observableArrayList();
     private ObservableList<Message> userMessages = FXCollections.observableArrayList();
@@ -36,8 +37,12 @@ public class MainController implements Initializable{
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        //users.add(new User("ahmad", "192.167.1.3"));
-        //users.add(new User("saeed", "192.167.1.2"));
+        try {
+            thisUser = new User("ahmad",String.valueOf(Inet4Address.getLocalHost().getHostAddress()));
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+        users.add(thisUser);
 
         tc_users.setCellValueFactory(new PropertyValueFactory<>("name"));
         tc_number_of_messages.setCellValueFactory(new PropertyValueFactory<>("newMessageNumber"));
@@ -61,7 +66,11 @@ public class MainController implements Initializable{
                 User selectedUser = tv_users.getSelectionModel().getSelectedItem();
                 if (selectedUser != null) {
                     currentUser = selectedUser;
-                    UpdateMessages(userMessages, lv_messages);
+                    users.get(FindUserIndexByIp(currentUser.ip)).newMessageNumber = 0;
+                    Platform.runLater(() -> {
+                        UpdateUsers(tv_users, userList);
+                    });
+                    UpdateMessages(userMessages, lv_messages, selectedUser.getIp());
                     System.out.println("User clicked: " + currentUser.ip);
                 }
             }
@@ -107,31 +116,25 @@ public class MainController implements Initializable{
     }
 
     public static void UpdateUsers(TableView<User> tv_users, ObservableList<User> userList){
+        userList.clear();
         userList.addAll(users);
         tv_users.setItems(userList);
         tv_users.setEditable(false);
     }
 
-    public static void UpdateMessages(ObservableList<Message> userMessages, ListView<Message> lv_messages) {
+    public static void UpdateMessages(ObservableList<Message> userMessages, ListView<Message> lv_messages, String senderAddress) {
         if (currentUser != null && !messages.isEmpty()) {
-            if (messages.getLast().getSender().equals(currentUser.getIp())) {
-                Platform.runLater(() -> {
-                    userMessages.clear();
-                });
-                for (Message message : messages) {
-                    if (message.getSender().equals(currentUser.getIp())) {
-                        Platform.runLater(() -> {
-                            userMessages.add(message);
-                        });
-                    }
+            Platform.runLater(() -> {
+                userMessages.clear();
+            });
+            for (Message message : messages) {
+                if (message.getSender().equals(FindUserByIp(senderAddress)) && message.getReceiver().equals(thisUser)) {
+                    Platform.runLater(() -> {
+                        userMessages.add(message);
+                    });
                 }
-
-                lv_messages.setItems(userMessages);
-            } else {
-                // TODO notfay user of a new message
             }
         }
-
         lv_messages.setItems(userMessages);
     }
 
@@ -162,15 +165,26 @@ public class MainController implements Initializable{
         socket.close();
     }
 
-    public static Boolean FindUserByIp(String ip) {
+    public static User FindUserByIp(String ip) {
         if (users != null) {
             for (User user : users) {
                 if (user.getIp().equals(ip)) {
-                    return true;
+                    return user;
                 }
             }
         }
-        return false;
+        return null;
+    }
+
+    public static int FindUserIndexByIp(String ip) {
+        if (users != null) {
+            for (int i = 0; i < users.size(); i++) {
+                if (users.get(i).getIp().equals(ip)) {
+                    return i;
+                }
+            }
+        }
+        return 0;
     }
 
 }

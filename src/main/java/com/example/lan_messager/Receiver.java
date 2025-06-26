@@ -10,6 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import static com.example.lan_messager.MainController.*;
 
@@ -43,13 +44,13 @@ public class Receiver implements Runnable{
                 socket.send(response);
 
                 System.out.println("Replied to: " + senderAddress.getHostAddress());
-                if (!FindUserByIp(senderAddress.getHostAddress())){
+                if (FindUserByIp(senderAddress.getHostAddress()) == null && !thisUser.ip.equals(senderAddress.getHostAddress())) {
                     users.add(new User(senderAddress.getHostAddress(), senderAddress.getHostAddress()));
                     System.out.println("new ip found: " + senderAddress.getHostAddress());
                     UpdateUsers(tv_users,userList);
                 }
             } else if (message.equals("I_AM_HERE")) {
-                if (!FindUserByIp(senderAddress.getHostAddress())){
+                if (FindUserByIp(senderAddress.getHostAddress()) == null && !thisUser.ip.equals(senderAddress.getHostAddress())){
                     users.add(new User(senderAddress.getHostAddress(), senderAddress.getHostAddress()));
                     System.out.println("new ip found: " + senderAddress.getHostAddress());
                     UpdateUsers(tv_users,userList);
@@ -57,16 +58,18 @@ public class Receiver implements Runnable{
             } else {
                 System.out.println("Discovery message received from: " + senderAddress.getHostAddress());
                 System.out.println("message: " + message);
-                LocalTime currentTime = LocalTime.now();
-                if (!FindUserByIp(senderAddress.getHostAddress())){
+                String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+                if (FindUserByIp(senderAddress.getHostAddress()) == null && !thisUser.ip.equals(senderAddress.getHostAddress())){
                     users.add(new User(senderAddress.getHostAddress(), senderAddress.getHostAddress()));
                     System.out.println("new ip found: " + senderAddress.getHostAddress());
                     UpdateUsers(tv_users,userList);
                 }
-                messages.add(new Message(message, senderAddress.getHostAddress(),String.valueOf(currentTime)));
-                User senderUser = messages.getLast().getSenderUserByIp(senderAddress.getHostAddress());
-                senderUser.newMessageNumber += 1;
-                UpdateMessages(userMessages,lv_messages);
+                messages.add(new Message(message, FindUserByIp(senderAddress.getHostAddress()),thisUser,String.valueOf(currentTime)));
+                UpdateMessages(userMessages,lv_messages,senderAddress.getHostAddress());
+                if (currentUser == null || currentUser.ip != senderAddress.getHostAddress()) {
+                    users.get(FindUserIndexByIp(senderAddress.getHostAddress())).newMessageNumber++;
+                }
+                UpdateUsers(tv_users, userList);
             }
         }
     }
