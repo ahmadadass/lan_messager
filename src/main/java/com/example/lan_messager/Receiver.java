@@ -66,7 +66,6 @@ public class Receiver implements Runnable{
                 messages.add(new Message(message, senderAddress.getHostAddress(),String.valueOf(currentTime)));
                 User senderUser = messages.getLast().getSenderUserByIp(senderAddress.getHostAddress());
                 senderUser.newMessageNumber += 1;
-                UpdateUsers(tv_users,userList);
                 UpdateMessages(userMessages,lv_messages);
             }
         }

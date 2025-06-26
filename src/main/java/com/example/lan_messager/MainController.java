@@ -1,11 +1,14 @@
 package com.example.lan_messager;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
@@ -64,6 +67,27 @@ public class MainController implements Initializable{
             }
         });
 
+        lv_messages.setCellFactory(listView -> new ListCell<Message>() {
+            @Override
+            protected void updateItem(Message message, boolean empty) {
+                super.updateItem(message, empty);
+                if (empty || message == null) {
+                    setGraphic(null);
+                } else {
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("message_cell.fxml"));
+                        Parent root = loader.load();
+                        MessageCellController controller = loader.getController();
+                        controller.setData(message);
+                        setGraphic(root); // 👈 This displays the FXML inside the ListView
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+
     }
 
     public void Search() throws IOException {
@@ -91,11 +115,18 @@ public class MainController implements Initializable{
     public static void UpdateMessages(ObservableList<Message> userMessages, ListView<Message> lv_messages) {
         if (currentUser != null && !messages.isEmpty()) {
             if (messages.getLast().getSender().equals(currentUser.getIp())) {
+                Platform.runLater(() -> {
+                    userMessages.clear();
+                });
                 for (Message message : messages) {
                     if (message.getSender().equals(currentUser.getIp())) {
-                        userMessages.add(message);
+                        Platform.runLater(() -> {
+                            userMessages.add(message);
+                        });
                     }
                 }
+
+                lv_messages.setItems(userMessages);
             } else {
                 // TODO notfay user of a new message
             }
@@ -105,10 +136,11 @@ public class MainController implements Initializable{
     }
 
     public void Send() throws Exception {
-        if (currentUser != null) {
+        if (currentUser != null && !tf_main.getText().isEmpty()) {
             SendMessage(currentUser.ip, tf_main.getText());
+            tf_main.setText("");
         } else {
-            System.out.println("No user selected");
+            System.out.println("No user selected\nPlease full all fields");
         }
     }
 
