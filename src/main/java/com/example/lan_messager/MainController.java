@@ -147,14 +147,14 @@ public class MainController implements Initializable{
     }
 
     public void Send() throws Exception {
-        if (currentUser != null && !tf_main.getText().isEmpty()) {
+        if (currentUser != null && !tf_main.getText().isEmpty() && tf_main.getText().length() <= 50) {
             String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
             messages.add(new Message(tf_main.getText(),thisUser,currentUser,currentTime));
             SendMessage(currentUser.ip, tf_main.getText());
             UpdateMessages(userMessages, lv_messages, currentUser.getIp());
             tf_main.setText("");
         } else {
-            System.out.println("No user selected\nPlease full all fields");
+            System.out.println("No user selected\nPlease full all fields\nNo more than 50 characters");
         }
     }
 
