@@ -3,9 +3,9 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 
-<HBox prefWidth="470.0" spacing="10" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.lan_messager.MessageCellController">
+<HBox fx:id="hb_message_container" nodeOrientation="RIGHT_TO_LEFT" prefWidth="470.0" spacing="10" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.lan_messager.MessageCellController">
 
-      <Label fx:id="l_senderUsername" style="-fx-font-weight: bold;" />
-      <Label fx:id="l_message" />
-      <Label fx:id="l_time" />
+      <Label fx:id="l_right" />
+      <Label fx:id="l_middle" />
+      <Label fx:id="l_left" />
 </HBox>

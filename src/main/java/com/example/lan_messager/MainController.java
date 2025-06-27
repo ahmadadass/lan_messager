@@ -14,6 +14,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.IOException;
 import java.net.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -38,11 +40,12 @@ public class MainController implements Initializable{
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         try {
-            thisUser = new User("ahmad",String.valueOf(Inet4Address.getLocalHost().getHostAddress()));
+            thisUser = new User(String.valueOf(Inet4Address.getLocalHost().getHostAddress()),String.valueOf(Inet4Address.getLocalHost().getHostAddress()));
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
         users.add(thisUser);
+        l_username.setText(thisUser.getName());
 
         tc_users.setCellValueFactory(new PropertyValueFactory<>("name"));
         tc_number_of_messages.setCellValueFactory(new PropertyValueFactory<>("newMessageNumber"));
@@ -87,7 +90,11 @@ public class MainController implements Initializable{
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("message_cell.fxml"));
                         Parent root = loader.load();
                         MessageCellController controller = loader.getController();
-                        controller.setData(message);
+                        if (message.sender.equals(currentUser)) {
+                            controller.setData(message, "RIGHT");
+                        } else {
+                            controller.setData(message, "LEFT");
+                        }
                         setGraphic(root); // 👈 This displays the FXML inside the ListView
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -96,7 +103,8 @@ public class MainController implements Initializable{
             }
         });
 
-
+        UpdateUsers(tv_users, userList);
+        UpdateMessages(userMessages, lv_messages, "0");
     }
 
     public void Search() throws IOException {
@@ -140,7 +148,10 @@ public class MainController implements Initializable{
 
     public void Send() throws Exception {
         if (currentUser != null && !tf_main.getText().isEmpty()) {
+            String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+            messages.add(new Message(tf_main.getText(),thisUser,thisUser,currentTime));
             SendMessage(currentUser.ip, tf_main.getText());
+            UpdateMessages(userMessages, lv_messages, currentUser.getIp());
             tf_main.setText("");
         } else {
             System.out.println("No user selected\nPlease full all fields");

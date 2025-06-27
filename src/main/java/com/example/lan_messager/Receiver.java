@@ -64,10 +64,12 @@ public class Receiver implements Runnable{
                     System.out.println("new ip found: " + senderAddress.getHostAddress());
                     UpdateUsers(tv_users,userList);
                 }
-                messages.add(new Message(message, FindUserByIp(senderAddress.getHostAddress()),thisUser,String.valueOf(currentTime)));
-                UpdateMessages(userMessages,lv_messages,senderAddress.getHostAddress());
-                if (currentUser == null || currentUser.ip != senderAddress.getHostAddress()) {
-                    users.get(FindUserIndexByIp(senderAddress.getHostAddress())).newMessageNumber++;
+                if (!senderAddress.getHostAddress().equals(thisUser.ip)) {
+                    messages.add(new Message(message, FindUserByIp(senderAddress.getHostAddress()), thisUser,currentTime));
+                    UpdateMessages(userMessages, lv_messages, senderAddress.getHostAddress());
+                    if (currentUser == null || !currentUser.ip.equals(senderAddress.getHostAddress())) {
+                        users.get(FindUserIndexByIp(senderAddress.getHostAddress())).newMessageNumber++;
+                    }
                 }
                 UpdateUsers(tv_users, userList);
             }
