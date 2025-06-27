@@ -53,8 +53,9 @@ public class Receiver implements Runnable{
                     System.out.println("new ip found: " + senderAddress.getHostAddress());
                     UpdateUsers(tv_users,userList);
                 } else if (FindUserByIp(senderAddress.getHostAddress()) != null) {
-                    System.out.println("Editing user "+ senderAddress.getHostAddress() +" username to: " + message.substring(27));
-                    users.get(FindUserIndexByIp(senderAddress.getHostAddress())).setName(message.substring(27));
+                    System.out.println("Editing user "+ senderAddress.getHostAddress() +" username to: " + message.substring(26));
+                    users.get(FindUserIndexByIp(senderAddress.getHostAddress())).setName(message.substring(26));
+                    UpdateUsers(tv_users,userList);
                 }
             } else if (message.contains("Hi_My_Name_Is: ")) {
                 if (FindUserByIp(senderAddress.getHostAddress()) == null && !thisUser.ip.equals(senderAddress.getHostAddress())){
