@@ -125,10 +125,11 @@ public class MainController implements Initializable{
         byte[] buffer = message.getBytes();
 
         // Send to the broadcast address of your LAN (example: 192.167.1.255)
-        InetAddress broadcastAddress = InetAddress.getByName("192.167.1.255");
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, broadcastAddress, 9876);
-
-        socket.send(packet);
+        for (int i=0; i<255; i++) {
+            InetAddress broadcastAddress = InetAddress.getByName("192.167.1." + i);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, broadcastAddress, 9876);
+            socket.send(packet);
+        }
         System.out.println("Broadcast message sent.");
         socket.close();
     }
