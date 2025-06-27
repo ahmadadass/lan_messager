@@ -1,6 +1,7 @@
 package com.example.lan_messager;
 
 import javafx.fxml.FXML;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
@@ -11,10 +12,10 @@ public class MessageCellController {
     public HBox hb_message_container;
 
     public void setData(Message message, String style) {
-        if (style.equals("RIGHR")) {
-            hb_message_container.setStyle("-fx-orientation: LEFT_TO_RIGHT;");
+        if (style.equals("RIGHT")) {
+            hb_message_container.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         } else if (style.equals("LEFT")) {
-            hb_message_container.setStyle("-fx-orientation: RIGHT_TO_LEFT;");
+            hb_message_container.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         }
 
         l_right.setStyle("-fx-font-weight: bold;");

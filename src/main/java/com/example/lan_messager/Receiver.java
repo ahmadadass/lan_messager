@@ -34,24 +34,26 @@ public class Receiver implements Runnable{
 
             //int senderPort = packet.getPort();
 
-            if (message.equals("DISCOVER_PEER")) {
+            if (message.contains("DISCOVER_PEER_My_Name_Is: ")) {
                 System.out.println("Discovery message received from: " + senderAddress.getHostAddress());
 
                 // Send back confirmation
-                String reply = "I_AM_HERE";
+
+                String reply = "Hi_My_Name_Is: " + thisUser.getName();
+
                 byte[] replyData = reply.getBytes();
                 DatagramPacket response = new DatagramPacket(replyData, replyData.length, senderAddress, 9876);
                 socket.send(response);
 
                 System.out.println("Replied to: " + senderAddress.getHostAddress());
                 if (FindUserByIp(senderAddress.getHostAddress()) == null && !thisUser.ip.equals(senderAddress.getHostAddress())) {
-                    users.add(new User(senderAddress.getHostAddress(), senderAddress.getHostAddress()));
+                    users.add(new User(message.substring(27), senderAddress.getHostAddress()));
                     System.out.println("new ip found: " + senderAddress.getHostAddress());
                     UpdateUsers(tv_users,userList);
                 }
-            } else if (message.equals("I_AM_HERE")) {
+            } else if (message.contains("Hi_My_Name_Is: ")) {
                 if (FindUserByIp(senderAddress.getHostAddress()) == null && !thisUser.ip.equals(senderAddress.getHostAddress())){
-                    users.add(new User(senderAddress.getHostAddress(), senderAddress.getHostAddress()));
+                    users.add(new User(message.substring(15), senderAddress.getHostAddress()));
                     System.out.println("new ip found: " + senderAddress.getHostAddress());
                     UpdateUsers(tv_users,userList);
                 }

@@ -111,7 +111,7 @@ public class MainController implements Initializable{
         DatagramSocket socket = new DatagramSocket();
         socket.setBroadcast(true); // enable broadcast
 
-        String message = "DISCOVER_PEER";
+        String message = "DISCOVER_PEER_My_Name_Is: " + thisUser.getName();
         byte[] buffer = message.getBytes();
 
         // Send to the broadcast address of your LAN (example: 192.167.1.255)
@@ -136,7 +136,7 @@ public class MainController implements Initializable{
                 userMessages.clear();
             });
             for (Message message : messages) {
-                if (message.getSender().equals(FindUserByIp(senderAddress)) && message.getReceiver().equals(thisUser)) {
+                if (message.getSender().equals(currentUser) && message.getReceiver().equals(thisUser) || message.getReceiver().equals(currentUser) && message.getSender().equals(thisUser)) {
                     Platform.runLater(() -> {
                         userMessages.add(message);
                     });
@@ -149,7 +149,7 @@ public class MainController implements Initializable{
     public void Send() throws Exception {
         if (currentUser != null && !tf_main.getText().isEmpty()) {
             String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
-            messages.add(new Message(tf_main.getText(),thisUser,thisUser,currentTime));
+            messages.add(new Message(tf_main.getText(),thisUser,currentUser,currentTime));
             SendMessage(currentUser.ip, tf_main.getText());
             UpdateMessages(userMessages, lv_messages, currentUser.getIp());
             tf_main.setText("");

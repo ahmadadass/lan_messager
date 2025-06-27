@@ -8,10 +8,10 @@ public class Message {
     User receiver;
     String time;
 
-    public Message(String massage, User sender, User thisUser, String time) {
+    public Message(String massage, User sender, User receiver, String time) {
         this.massage = massage;
         this.sender = sender;
-        this.receiver = thisUser;
+        this.receiver = receiver;
         this.time = time;
     }
 
