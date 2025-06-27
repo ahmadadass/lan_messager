@@ -16,6 +16,8 @@ import static com.example.lan_messager.MainController.*;
 
 public class Receiver implements Runnable{
 
+    public static boolean isRunning = false;
+
     public static void Receiver(Label l_username, TextField tf_main, TableView<User> tv_users, TableColumn<User, String> tc_users, TableColumn<User, String> tc_number_of_messages, ListView<Message> lv_messages, ObservableList<User> userList, ObservableList<Message> userMessages) throws IOException {
         DatagramSocket socket = new DatagramSocket(9876);
         byte[] buffer = new byte[1024];
@@ -50,6 +52,9 @@ public class Receiver implements Runnable{
                     users.add(new User(message.substring(27), senderAddress.getHostAddress()));
                     System.out.println("new ip found: " + senderAddress.getHostAddress());
                     UpdateUsers(tv_users,userList);
+                } else if (FindUserByIp(senderAddress.getHostAddress()) != null) {
+                    System.out.println("Editing user "+ senderAddress.getHostAddress() +" username to: " + message.substring(27));
+                    users.get(FindUserIndexByIp(senderAddress.getHostAddress())).setName(message.substring(27));
                 }
             } else if (message.contains("Hi_My_Name_Is: ")) {
                 if (FindUserByIp(senderAddress.getHostAddress()) == null && !thisUser.ip.equals(senderAddress.getHostAddress())){
@@ -79,10 +84,20 @@ public class Receiver implements Runnable{
     }
 
     @Override public void run() {
+
+        if (isRunning) {
+            System.out.println("Receiver is already running.");
+            return;
+        }
+
+        isRunning = true;
+
         try {
             Receiver(l_username,tf_main,tv_users,tc_users,tc_number_of_messages,lv_messages,userList,userMessages);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            isRunning = false;
         }
     }
 

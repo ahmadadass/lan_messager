@@ -5,12 +5,16 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.*;
@@ -27,6 +31,9 @@ public class MainController implements Initializable{
     @FXML TableColumn<User, String> tc_users;
     @FXML TableColumn<User, String> tc_number_of_messages;
     @FXML ListView<Message> lv_messages;
+    @FXML Parent root;
+    @FXML Scene scene;
+    @FXML Stage stage;
 
     static ArrayList<User> users = new ArrayList<User>();
     static ArrayList<Message> messages = new ArrayList<Message>();
@@ -40,12 +47,13 @@ public class MainController implements Initializable{
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         try {
-            thisUser = new User(String.valueOf(Inet4Address.getLocalHost().getHostAddress()),String.valueOf(Inet4Address.getLocalHost().getHostAddress()));
+            if (thisUser == null) {
+                thisUser = new User(String.valueOf(Inet4Address.getLocalHost().getHostAddress()), String.valueOf(Inet4Address.getLocalHost().getHostAddress()));
+                users.add(thisUser);
+            }
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
-        users.add(thisUser);
-        l_username.setText(thisUser.getName());
 
         tc_users.setCellValueFactory(new PropertyValueFactory<>("name"));
         tc_number_of_messages.setCellValueFactory(new PropertyValueFactory<>("newMessageNumber"));
@@ -53,7 +61,7 @@ public class MainController implements Initializable{
         tc_users.setStyle("-fx-alignment: CENTER;");
         tc_number_of_messages.setStyle("-fx-alignment: CENTER;");
 
-        Thread threadReceiver = new Thread(new Receiver(l_username,tf_main,tv_users,tc_users,tc_number_of_messages,lv_messages,userList, userMessages));
+        Thread threadReceiver = new Thread(new Receiver(l_username, tf_main, tv_users, tc_users, tc_number_of_messages, lv_messages, userList, userMessages));
         threadReceiver.start();
 
         try {
@@ -103,6 +111,8 @@ public class MainController implements Initializable{
             }
         });
 
+
+        l_username.setText(thisUser.getName());
         UpdateUsers(tv_users, userList);
         UpdateMessages(userMessages, lv_messages, "0");
     }
@@ -158,7 +168,19 @@ public class MainController implements Initializable{
         }
     }
 
-    public void Profile(){}
+    public void Profile(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("profile_view.fxml"));
+
+        root = loader.load();
+
+        //ProfileController profileController = new ProfileController();
+        //profileController.setData(thisUser.getIp(), thisUser.getName(), 0);
+
+        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
+    }
 
     public static void SendMessage(String ip, String message) throws Exception{
         DatagramSocket socket = new DatagramSocket();
